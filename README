@@ -1,0 +1,40 @@
+CodeMirror Extended Syntax
+==========================
+
+Optional editor-only highlighting for the CosmoCode DokuWiki CodeMirror plugin
+(2026 module-based version). No DokuWiki core, CodeMirror, or renderer changes.
+
+All definitions live in this plugin's definitions.js, grouped by plugin name.
+There are no files to install or maintain in the supported plugins themselves.
+Each definition is an object with any of these fields:
+
+  tags: ['figure', 'subfigure', 'caption']
+  braces: ['ref', 'autoref']
+  mediaExtensions: ['svg']
+  tokens: [{match: /^@EXAMPLE@/, style: 'variable-2', sol: false}]
+  blocks: [{open: /^\/\*/, close: '*/', style: 'comment', singleLine: false}]
+  codeOptions: true
+
+Patterns must match at the current position, consume at least one character,
+and have no global/sticky flags. Tags and prefixes are case-sensitive; include
+all supported spellings. Blocks protect their contents from wiki highlighting.
+Styles are standard CodeMirror styles: tag, attribute, string, keyword, number,
+operator, link, meta, comment, etc. The selected editor theme controls colours.
+
+The loader only runs on editor pages and selects rules for installed, enabled
+plugins from definitions.js. It does not infer syntax from their PHP code.
+It handles asynchronous loading and editor/highlighting toggles through the
+upstream codemirror_ready event. Disabling it leaves ordinary CodeMirror intact.
+
+Supported plugins: approve, bootswrapper, codehighlightjs, datatables, diagrams,
+gallery, icons, iframe, latexcaption, mathjax, pageredirect, qrcodephp, threejs.
+
+This is a highlighter, not syntax validation or autocomplete. It never changes
+the text that is saved. Update definitions.js here when adding custom syntax.
+Code/file/nowiki and embedded language contents retain their native highlighting.
+Supported plugins do not require this integration to render pages.
+
+The tests/mode.test.mjs regression test uses the installed CodeMirror mode:
+  node lib/plugins/codemirrorsyntax/tests/mode.test.mjs
+
+License: GPL-2.0-or-later

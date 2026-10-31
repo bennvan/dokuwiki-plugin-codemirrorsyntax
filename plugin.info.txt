@@ -1,0 +1,6 @@
+base   codemirrorsyntax
+author Ben van Magill
+date   2026-10-31
+name   CodeMirror Extended Syntax
+desc   Adds editor syntax highlighting for supported custom DokuWiki plugins.
+url    https://www.dokuwiki.org/plugin:codemirror
