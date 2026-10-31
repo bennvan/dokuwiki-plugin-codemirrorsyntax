@@ -14,7 +14,7 @@ globalThis.window = {CodeMirror: {copyState: (mode, state) => ({...state})}};
 const {dokuMode} = await import(new URL('mode.js', cmRoot));
 const plugins = [
     'bootswrapper', 'latexcaption', 'icons', 'datatables', 'gallery', 'iframe',
-    'diagrams', 'threejs', 'approve', 'codehighlightjs', 'mathjax', 'pageredirect', 'qrcodephp',
+    'diagrams', 'threejs', 'approve', 'codehighlightjs', 'mathjax', 'meta', 'pageredirect', 'qrcodephp',
 ];
 const definitions = getDefinitions(plugins);
 assert.equal(definitions.length, plugins.length);
@@ -81,6 +81,25 @@ has('\\(x\\)', '\\(x\\)', 'string-2');
 has('\\[x\\]', '\\[x\\]', 'string-2');
 has('~~REDIRECT>start~~', '~~REDIRECT>start~~', 'meta');
 has('#redirect start', '#redirect start', 'meta');
+has('~~META:title=Example&description abstract=A summary~~', '~~META:', 'tag');
+has('~~META:\ntitle = Process Outline\n~~', 'title', 'attribute');
+has('~~META:\ntitle = Process Outline\n~~', '=', 'operator');
+has('~~META:\ntitle = Process Outline\n~~', 'Process Outline', 'string');
+has('~~META:\ntitle = Process Outline\n~~', '~~', 'tag');
+has('~~META:\ntitle=Example\n\n&description abstract=A summary\n~~\n<card>', 'description abstract', 'attribute');
+has('~~META:\ntitle=Example\n\n&description abstract=A summary\n~~\n<card>', 'A summary', 'string');
+has('~~META:title=**literal** {{ref>example}}~~', '**literal** {{ref>example}}', 'string');
+has('~~META:title=Example~~<card>', '<card', 'tag');
+has('~~META:\ntitle=Example\n~~\n**Title**', '**', 'strong');
+for (const source of [
+    '<nowiki>~~META:title=Example~~</nowiki>',
+    '<code text>\n~~META:title=Example~~\n</code>',
+]) {
+    assert(!tokenize(source).some(token => token.text === '~~META:' && token.style === 'tag'));
+    checks++;
+}
+assert(!tokenize('~~META:title=Example~~', makeMode([])).some(token => token.text === '~~META:' && token.style === 'tag'));
+checks++;
 has('{{QRCODE 150>https://example.test}}', '{{QRCODE 150>', 'tag');
 has('<card title="a > b">', '"a > b"', 'string');
 has('<card title="two\nlines">', 'lines"', 'string');

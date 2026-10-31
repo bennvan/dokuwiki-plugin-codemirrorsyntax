@@ -41,6 +41,9 @@ const definitions = {
             {open: /^\\\[/, close: '\\]', style: 'string-2'},
         ],
     },
+    meta: {
+        blocks: [{open: /^~~META:/, close: '~~', keyValue: true}],
+    },
     pageredirect: {
         tokens: [
             {match: /^~~REDIRECT>.*?~~/, style: 'meta'},

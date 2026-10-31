@@ -47,6 +47,29 @@ export function extendMode(base, definitions) {
         return null;
     }
 
+    function keyValue(stream, extra) {
+        if (stream.match(extra.block.close)) {
+            extra.block = null;
+            return 'tag';
+        }
+        if (stream.match('&')) {
+            extra.value = false;
+            return 'operator';
+        }
+        if (!extra.value && stream.match('=')) {
+            extra.value = true;
+            return 'operator';
+        }
+        if (stream.eatSpace()) return null;
+        if (extra.value) {
+            // Metadata values are literal text, not nested wiki formatting.
+            if (!stream.match(/^[^&~]+/)) stream.next();
+            return 'string';
+        }
+        if (!stream.match(/^[^\s=&~]+(?:[ \t]+[^\s=&~]+)*/)) stream.next();
+        return 'attribute';
+    }
+
     return {
         ...base,
         startState() {
@@ -67,6 +90,7 @@ export function extendMode(base, definitions) {
             const extra = state.pluginSyntax;
             if (extra.block) {
                 const rule = extra.block;
+                if (rule.keyValue) return keyValue(stream, extra);
                 if (consumeUntil(stream, rule.close) || rule.singleLine) extra.block = null;
                 return rule.style || 'comment';
             }
@@ -90,6 +114,11 @@ export function extendMode(base, definitions) {
             for (const rule of blocks) {
                 if (rule.sol && !stream.sol()) continue;
                 if (stream.match(rule.open)) {
+                    if (rule.keyValue) {
+                        extra.block = rule;
+                        extra.value = false;
+                        return 'tag';
+                    }
                     if (!consumeUntil(stream, rule.close) && !rule.singleLine) extra.block = rule;
                     return rule.style || 'comment';
                 }

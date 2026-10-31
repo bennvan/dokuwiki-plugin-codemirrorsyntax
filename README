@@ -18,6 +18,8 @@ Each definition is an object with any of these fields:
 Patterns must match at the current position, consume at least one character,
 and have no global/sticky flags. Tags and prefixes are case-sensitive; include
 all supported spellings. Blocks protect their contents from wiki highlighting.
+Blocks with keyValue: true colour their opening/closing markers, keys, equals
+signs, ampersand separators and literal values separately (used by Meta).
 Styles are standard CodeMirror styles: tag, attribute, string, keyword, number,
 operator, link, meta, comment, etc. The selected editor theme controls colours.
 
@@ -27,7 +29,7 @@ It handles asynchronous loading and editor/highlighting toggles through the
 upstream codemirror_ready event. Disabling it leaves ordinary CodeMirror intact.
 
 Supported plugins: approve, bootswrapper, codehighlightjs, datatables, diagrams,
-gallery, icons, iframe, latexcaption, mathjax, pageredirect, qrcodephp, threejs.
+gallery, icons, iframe, latexcaption, mathjax, meta, pageredirect, qrcodephp, threejs.
 
 This is a highlighter, not syntax validation or autocomplete. It never changes
 the text that is saved. Update definitions.js here when adding custom syntax.
