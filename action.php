@@ -8,15 +8,20 @@ class action_plugin_codemirrorsyntax extends ActionPlugin
 {
     public function register(EventHandler $controller)
     {
-        $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'addScripts');
+        // Run after CodeMirror so we can detect resources it already supplied.
+        $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'addScripts', null, 100);
     }
 
     public function addScripts(Event $event)
     {
         global $ACT;
         if (plugin_isdisabled('codemirror') || !in_array($ACT, [
-            'edit', 'create', 'source', 'preview', 'locked', 'draft', 'recover'
+            'edit', 'create', 'source', 'preview', 'changes', 'locked', 'draft', 'recover'
         ], true)) return;
+
+        if ($ACT === 'changes' && !plugin_isdisabled('diffpreview')) {
+            $this->addChangesEditor($event);
+        }
 
         $event->data['script'][] = [
             '_data' => 'window.dokuCodeMirrorSyntaxPlugins = ' . json_encode(plugin_list(),
@@ -29,5 +34,28 @@ class action_plugin_codemirrorsyntax extends ActionPlugin
                 filemtime(__DIR__ . '/definitions.js')
             ),
         ];
+    }
+
+    /** Reuse CodeMirror's editor resources for DiffPreview's custom action. */
+    private function addChangesEditor(Event $event)
+    {
+        global $ACT;
+
+        // A future CodeMirror release may support this action itself.
+        foreach ($event->data['script'] ?? [] as $script) {
+            if (str_starts_with($script['src'] ?? '', DOKU_BASE . 'lib/plugins/codemirror/init.js')) return;
+        }
+        $codemirror = plugin_load('action', 'codemirror');
+        if (!is_callable([$codemirror, 'handleTplMetaheaderOutput'])) return;
+
+        // Only its resource loader sees "preview". Keep the actual Changes
+        // action intact for rendering, permissions and all other plugins.
+        $action = $ACT;
+        try {
+            $ACT = 'preview';
+            $codemirror->handleTplMetaheaderOutput($event, null);
+        } finally {
+            $ACT = $action;
+        }
     }
 }

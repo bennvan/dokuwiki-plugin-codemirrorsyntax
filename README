@@ -27,6 +27,9 @@ The loader only runs on editor pages and selects rules for installed, enabled
 plugins from definitions.js. It does not infer syntax from their PHP code.
 It handles asynchronous loading and editor/highlighting toggles through the
 upstream codemirror_ready event. Disabling it leaves ordinary CodeMirror intact.
+DiffPreview's Changes view reuses CodeMirror's existing editor resource loader,
+so the editor and extended highlighting remain available without patching
+CodeMirror or DiffPreview. Resources already supplied by CodeMirror are reused.
 
 Supported plugins: approve, bootswrapper, codehighlightjs, commentsyntax, datatables, diagrams,
 gallery, icons, iframe, latexcaption, mathjax, meta, pageredirect, qrcodephp, threejs.
