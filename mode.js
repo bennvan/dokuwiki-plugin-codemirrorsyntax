@@ -142,9 +142,10 @@ export function extendMode(base, definitions) {
             }
             const media = stream.match(/^\{\{\s*[^}\n?|]+\.([a-z0-9]+)(?=[?\s|}])/, false);
             if (media && extensions.has(media[1].toLowerCase())) {
-                stream.match(media[0]);
+                // Keep both delimiters consistent; tokenize the filename separately.
+                stream.match('{{');
                 Object.assign(extra, {end: '}}', kind: 'brace', quote: null});
-                return 'link';
+                return 'tag';
             }
             return base.token(stream, state);
         },

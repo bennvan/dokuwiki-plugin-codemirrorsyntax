@@ -31,6 +31,14 @@ upstream codemirror_ready event. Disabling it leaves ordinary CodeMirror intact.
 Supported plugins: approve, bootswrapper, codehighlightjs, datatables, diagrams,
 gallery, icons, iframe, latexcaption, mathjax, meta, pageredirect, qrcodephp, threejs.
 
+MathJax highlighting covers $...$, $$...$$, \(...\), \[...\], and the named
+environments protected by the MathJax plugin: math, displaymath, equation,
+eqnarray, align, flalign, alignat, multline and gather (including supported
+starred forms). A named block ends at its matching \end{environment}, including
+across blank lines; nested environments with other names do not end it early.
+The whole expression uses string and string-2 token styles, so themes such as
+Monokai that do not colour string-2 still highlight it as a string.
+
 This is a highlighter, not syntax validation or autocomplete. It never changes
 the text that is saved. Update definitions.js here when adding custom syntax.
 Code/file/nowiki and embedded language contents retain their native highlighting.

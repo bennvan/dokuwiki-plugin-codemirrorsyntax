@@ -70,6 +70,18 @@ has('{{gallery>photos?200x150}}', '200x150', 'number');
 has('<gallery>\n{{image.png}}\n</gallery>', '<gallery', 'tag');
 has('{{iframe>https://example.test?width=100%}}', 'width', 'attribute');
 has('{{drawing.svg?width=100%|Diagram}}', '100%', 'number');
+for (const source of [
+    '<figure center|fig_label>\n{{wiki:dokuwiki.svg?90|imagetitle }}\n<caption>caption</caption>\n</figure>',
+    '\\begin{equation}\nF = ma\n\\end{equation}\n{{wiki:dokuwiki.svg?90|imagetitle }}',
+]) {
+    has(source, '{{', 'tag');
+    has(source, '}}', 'tag');
+    has(source, 'wiki:dokuwiki.svg', 'link');
+    has(source, '90', 'number');
+}
+has('{{ model.stl?width=400 }}', '{{', 'tag');
+has('{{ model.stl?width=400 }}', 'model.stl', 'link');
+has('{{ model.stl?width=400 }}', '}}', 'tag');
 has('{{model.stl?width=400&color=blue}}', 'color', 'attribute');
 has('@APPROVE_VERSION@', '@APPROVE_VERSION@', 'variable-2');
 has('---- approve table ----\ncolumns: title,version\n----\n<card>', 'columns: title,version', 'meta');
@@ -79,6 +91,36 @@ has('$x^2$', '$x^2$', 'string-2');
 has('$$x\n\n+ y$$\n<card>', '<card', 'tag');
 has('\\(x\\)', '\\(x\\)', 'string-2');
 has('\\[x\\]', '\\[x\\]', 'string-2');
+has('$x^2$', '$x^2$', 'string');
+has('\\begin{equation}x\\end{equation}', '\\begin{equation}x\\end{equation}', 'string');
+for (const environment of [
+    'math', 'displaymath', 'equation', 'equation*', 'eqnarray', 'eqnarray*',
+    'align', 'align*', 'flalign', 'flalign*', 'alignat', 'alignat*',
+    'multline', 'multline*', 'gather', 'gather*',
+]) {
+    const begin = '\\begin{' + environment + '}';
+    const end = '\\end{' + environment + '}';
+    has('Before ' + begin + 'x^2' + end + ' **after**', begin + 'x^2' + end, 'string-2');
+    has(begin + '\nx_1 &= 2 \\\\\n\n\\frac{a}{b}\n' + end + '<card>', '\\frac{a}{b}', 'string-2');
+    has(begin + '\nx^2\n' + end + '<card>', '<card', 'tag');
+}
+const nestedMath = '\\begin{equation}\n\\begin{aligned}\nx &= y\n\\end{aligned}\n**still math**\n\\end{equation}**after**';
+has(nestedMath, '**still math**', 'string-2');
+has(nestedMath, '**', 'strong');
+has('\\begin{align*}\nx\\end{align}\ny\n\\end{align*}<card>', 'y', 'string-2');
+has('\\begin{align*}\nx\\end{align}\ny\n\\end{align*}<card>', '<card', 'tag');
+for (const source of [
+    '<nowiki>\\begin{align}x\\end{align}</nowiki>',
+    '<code text>\n\\begin{align}x\\end{align}\n</code>',
+    '<file text>\n\\begin{align}x\\end{align}\n</file>',
+    '  \\begin{align}x\\end{align}',
+    '\\begin{notmath}x\\end{notmath}',
+]) {
+    assert(!tokenize(source).some(token => token.style?.split(' ').includes('string-2')));
+    checks++;
+}
+assert(!tokenize('\\begin{align}x\\end{align}', makeMode(getDefinitions(['bootswrapper']))).some(token => token.style?.split(' ').includes('string-2')));
+checks++;
 has('~~REDIRECT>start~~', '~~REDIRECT>start~~', 'meta');
 has('#redirect start', '#redirect start', 'meta');
 has('~~META:title=Example&description abstract=A summary~~', '~~META:', 'tag');

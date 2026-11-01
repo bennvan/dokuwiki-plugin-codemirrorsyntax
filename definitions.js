@@ -1,4 +1,11 @@
 /** Syntax definitions for the custom plugins supported by CodeMirror Extended Syntax. */
+// Match the environments protected by MathJax's protecttex syntax component.
+const mathEnvironments = [
+    'math', 'displaymath', 'equation', 'equation*', 'eqnarray', 'eqnarray*',
+    'align', 'align*', 'flalign', 'flalign*', 'alignat', 'alignat*',
+    'multline', 'multline*', 'gather', 'gather*',
+];
+
 const definitions = {
     approve: {
         tokens: [{match: /^@APPROVE_(?:VERSION|DATE|USER)@/, style: "variable-2"}],
@@ -34,11 +41,17 @@ const definitions = {
         braces: ["ref", "autoref", "setcounter"],
     },
     mathjax: {
+        // Monokai has no string-2 colour; string supplies a theme-native fallback.
         blocks: [
-            {open: /^\$\$/, close: '$$', style: 'string-2'},
-            {open: /^\$(?=[^$\r\n]+\$)/, close: '$', style: 'string-2', singleLine: true},
-            {open: /^\\\(/, close: '\\)', style: 'string-2'},
-            {open: /^\\\[/, close: '\\]', style: 'string-2'},
+            {open: /^\$\$/, close: '$$', style: 'string string-2'},
+            {open: /^\$(?=[^$\r\n]+\$)/, close: '$', style: 'string string-2', singleLine: true},
+            {open: /^\\\(/, close: '\\)', style: 'string string-2'},
+            {open: /^\\\[/, close: '\\]', style: 'string string-2'},
+            ...mathEnvironments.map(environment => ({
+                open: new RegExp('^\\\\begin\\{' + environment.replace('*', '\\*') + '\\}'),
+                close: '\\end{' + environment + '}',
+                style: 'string string-2',
+            })),
         ],
     },
     meta: {
