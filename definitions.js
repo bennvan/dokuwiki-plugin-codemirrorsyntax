@@ -20,6 +20,12 @@ const definitions = {
         // Permit this plugin's additional options after the filename.
         codeOptions: true,
     },
+    commentsyntax: {
+        blocks: [
+            {open: /^\/\*/, close: '*/', style: 'comment'},
+            {open: /^<!--/, close: '-->', style: 'comment'},
+        ],
+    },
     datatables: {
         tags: ["datatables", "datatable", "DATATABLES", "DATATABLE"],
     },

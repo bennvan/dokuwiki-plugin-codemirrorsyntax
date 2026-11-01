@@ -1,0 +1,4 @@
+/* Monokai omits meta tokens, used by DokuWiki's page controls. */
+.cm-s-monokai.CodeMirror span.cm-meta {
+    color: #66d9ef;
+}

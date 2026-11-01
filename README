@@ -28,8 +28,14 @@ plugins from definitions.js. It does not infer syntax from their PHP code.
 It handles asynchronous loading and editor/highlighting toggles through the
 upstream codemirror_ready event. Disabling it leaves ordinary CodeMirror intact.
 
-Supported plugins: approve, bootswrapper, codehighlightjs, datatables, diagrams,
+Supported plugins: approve, bootswrapper, codehighlightjs, commentsyntax, datatables, diagrams,
 gallery, icons, iframe, latexcaption, mathjax, meta, pageredirect, qrcodephp, threejs.
+
+Monokai's missing meta colour is supplied by style.css so core page controls
+(NOTOC, NOCACHE) and BootsWrapper macros are visible in that theme too.
+Comment Syntax's /* ... */ and <!-- ... --> blocks use the theme's muted comment
+colour, including across blank lines. Optional nested and // comments are not
+supported; //italic// retains its normal DokuWiki highlighting.
 
 MathJax highlighting covers $...$, $$...$$, \(...\), \[...\], and the named
 environments protected by the MathJax plugin: math, displaymath, equation,

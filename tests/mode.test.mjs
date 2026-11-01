@@ -14,7 +14,7 @@ globalThis.window = {CodeMirror: {copyState: (mode, state) => ({...state})}};
 const {dokuMode} = await import(new URL('mode.js', cmRoot));
 const plugins = [
     'bootswrapper', 'latexcaption', 'icons', 'datatables', 'gallery', 'iframe',
-    'diagrams', 'threejs', 'approve', 'codehighlightjs', 'mathjax', 'meta', 'pageredirect', 'qrcodephp',
+    'diagrams', 'threejs', 'approve', 'codehighlightjs', 'commentsyntax', 'mathjax', 'meta', 'pageredirect', 'qrcodephp',
 ];
 const definitions = getDefinitions(plugins);
 assert.equal(definitions.length, plugins.length);
@@ -61,6 +61,22 @@ has('<grid>\n<col lg="6">\n<figure noprefix|label>\n<caption>Hi</caption>\n</fig
 has('<figure noprefix|label>', 'label', 'keyword');
 has('<page-nav next="details"></page-nav>', 'next', 'attribute');
 has('~~NOPAGETOOLS~~', '~~NOPAGETOOLS~~', 'meta');
+for (const name of ['NOTOC', 'NOCACHE', 'CLEARFIX', 'PAGEBREAK', 'NOBREAD', 'NOPAGEICONS', 'NOPAGEINFO', 'NOPAGETOOLS']) {
+    has('~~' + name + '~~', '~~' + name + '~~', 'meta');
+}
+for (const [open, close] of [['/*', '*/'], ['<!--', '-->']]) {
+    const comment = open + ' **hidden** {{fa>home}} ~~NOTOC~~ ' + close;
+    has('Before ' + comment + ' after', comment, 'comment');
+    has(open + '\n\n**hidden**\n' + close + '<card>', '**hidden**', 'comment');
+    has(open + '\n\n**hidden**\n' + close + '<card>', '<card', 'tag');
+    has(open + ' unfinished\nmore', 'more', 'comment');
+    for (const source of ['<nowiki>' + comment + '</nowiki>', '%%' + comment + '%%', '<code js>\n' + comment + '\n</code>', '<file text>\n' + comment + '\n</file>']) {
+        assert(!tokenize(source).some(token => token.style === 'comment'));
+        checks++;
+    }
+    assert(!tokenize(comment, makeMode(getDefinitions(['bootswrapper']))).some(token => token.style === 'comment'));
+    checks++;
+}
 has('{{fa>wrench?42}}', '42', 'number');
 has('[[start|{{fa>home?24}}]]', '{{fa>', 'tag');
 has('{{autoref>equipment}}', '{{autoref>', 'tag');
