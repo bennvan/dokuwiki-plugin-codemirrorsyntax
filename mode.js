@@ -9,6 +9,11 @@ export function extendMode(base, definitions) {
     const tokens = definitions.flatMap(rule => rule.tokens || []);
     const blocks = definitions.flatMap(rule => rule.blocks || []);
     const codeOptions = definitions.some(rule => rule.codeOptions);
+    // DokuWiki's innerMode() returns the original mode outside code blocks.
+    // Set delimiters there too, so CodeMirror's comment helper can find them.
+    for (const rule of definitions) {
+        if (rule.comments) Object.assign(base, rule.comments);
+    }
 
     function consumeUntil(stream, end) {
         while (!stream.eol()) {

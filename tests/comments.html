@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><title>Comment shortcut test</title>
+<link rel="stylesheet" href="../../codemirror/lib/codemirror/lib/codemirror.css">
+<script src="../../codemirror/lib/codemirror/lib/codemirror.js"></script>
+<script src="../../codemirror/lib/codemirror/mode/javascript/javascript.js"></script>
+<script src="../vendor/codemirror/comment.js"></script>
+<div id="editor"></div><pre id="result">RUNNING</pre>
+<script type="module">
+const result = document.querySelector('#result');
+try {
+ const {dokuMode} = await import('../../codemirror/mode.js');
+ CodeMirror.defineMode('doku', config => dokuMode(config, {
+  smileys: [], acronyms: [], entities: [], schemes: ['http', 'https'],
+  validLang: () => true, loadMode: lang => CodeMirror.getMode(config, lang === 'js' ? 'javascript' : lang),
+ }));
+ const cm = CodeMirror(document.querySelector('#editor'), {mode: 'doku'});
+ const originalEnter = () => {};
+ cm.setOption('extraKeys', {'Enter': originalEnter});
+ window.plugin_codemirror = {cm};
+ window.dokuCodeMirrorSyntaxPlugins = ['commentsyntax'];
+ let ready;
+ window.jQuery = () => ({on: (name, fn) => {ready=fn;}});
+ await import('../loader.js');
+ let count=0;
+ function check(condition, msg) {if(!condition)throw Error(msg+'; text='+JSON.stringify(cm.getValue()));count++;}
+ function setup(text, from={line:0,ch:0}, to=from) {cm.setValue(text);cm.setSelection(from,to);cm.clearHistory();cm.focus();}
+ async function key(mac=false) {
+  await new Promise(resolve => setTimeout(resolve, 150));
+  cm.getInputField().dispatchEvent(new KeyboardEvent('keydown',{key:'/',code:'Slash',keyCode:191,which:191,ctrlKey:!mac,metaKey:mac,bubbles:true,cancelable:true}));
+ }
+ setup('Hello wiki');await key();check(cm.getValue()==='/* Hello wiki */','Ctrl+/ comments current line');
+ await key();check(cm.getValue()==='Hello wiki','Ctrl+/ uncomments current line');
+ setup('first\nsecond\nthird',{line:0,ch:0},{line:2,ch:0});await key();
+ check(cm.getValue()==='/* first\nsecond */\nthird','Selection excludes next line at column zero');
+ await key();check(cm.getValue()==='first\nsecond\nthird','Multiline toggle restores original');
+ setup('first\n\nlast',{line:0,ch:0},{line:2,ch:4});await key();await key();check(cm.getValue()==='first\n\nlast','Blank lines round-trip');
+ setup('Undo this');await key();cm.undo();check(cm.getValue()==='Undo this','Undo restores whole operation');
+ setup('Mac shortcut');await key(true);check(cm.getValue()==='/* Mac shortcut */','Cmd+/ comments');
+ await key(true);check(cm.getValue()==='Mac shortcut','Cmd+/ uncomments');
+ setup('<code js>\nconst x = 1;\n</code>',{line:1,ch:0});await key();check(cm.getValue().includes('// const x = 1;'),'Embedded JS gets language comment');
+ await key();check(cm.getValue()==='<code js>\nconst x = 1;\n</code>','Embedded JS uncomment');
+ setup('Read only');cm.setOption('readOnly',true);await key();check(cm.getValue()==='Read only','Read-only unchanged');cm.setOption('readOnly',false);
+ check(cm.getOption('extraKeys').Enter===originalEnter,'Existing keys preserved');
+ const maps=cm.state.keyMaps.length;ready(null,cm);check(cm.state.keyMaps.length===maps,'Repeat ready hook does not duplicate maps');
+ cm.setOption('mode','doku');setup('After toggle');await key();await key();check(cm.getValue()==='After toggle','Recreated mode works');
+ result.textContent='PASS '+count+' browser checks';
+} catch(e) {result.textContent='FAIL '+e.stack;}
+</script>

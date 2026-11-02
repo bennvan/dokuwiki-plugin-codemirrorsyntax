@@ -21,6 +21,7 @@ const definitions = {
         codeOptions: true,
     },
     commentsyntax: {
+        comments: {blockCommentStart: '/*', blockCommentEnd: '*/'},
         blocks: [
             {open: /^\/\*/, close: '*/', style: 'comment'},
             {open: /^<!--/, close: '-->', style: 'comment'},

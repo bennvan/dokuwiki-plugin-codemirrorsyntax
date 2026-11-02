@@ -46,7 +46,10 @@ function tokenize(text, mode = makeMode()) {
     }
     return tokens;
 }
-let checks = 0;
+assert.equal(makeMode().blockCommentStart, '/*');
+assert.equal(makeMode().blockCommentEnd, '*/');
+assert.equal(makeMode(getDefinitions(['icons'])).blockCommentStart, undefined);
+let checks = 3;
 function has(source, text, style, mode) {
     const tokens = tokenize(source, mode);
     assert(tokens.some(token => token.text === text && token.style?.split(' ').includes(style)),

@@ -23,8 +23,17 @@ class action_plugin_codemirrorsyntax extends ActionPlugin
             $this->addChangesEditor($event);
         }
 
+        $plugins = plugin_list();
+        if (in_array('commentsyntax', $plugins, true)) {
+            $event->data['script'][] = [
+                'src' => DOKU_BASE . 'lib/plugins/codemirrorsyntax/vendor/codemirror/comment.js?v=' .
+                    filemtime(__DIR__ . '/vendor/codemirror/comment.js'),
+                'defer' => 'defer',
+            ];
+        }
+
         $event->data['script'][] = [
-            '_data' => 'window.dokuCodeMirrorSyntaxPlugins = ' . json_encode(plugin_list(),
+            '_data' => 'window.dokuCodeMirrorSyntaxPlugins = ' . json_encode($plugins,
                 JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';',
         ];
         $event->data['script'][] = [

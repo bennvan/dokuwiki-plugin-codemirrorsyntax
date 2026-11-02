@@ -1,7 +1,7 @@
 CodeMirror Extended Syntax
 ==========================
 
-Optional editor-only highlighting for the CosmoCode DokuWiki CodeMirror plugin
+Optional editor highlighting and comment shortcut for the CosmoCode DokuWiki CodeMirror plugin
 (2026 module-based version). No DokuWiki core, CodeMirror, or renderer changes.
 
 All definitions live in this plugin's definitions.js, grouped by plugin name.
@@ -40,6 +40,15 @@ Comment Syntax's /* ... */ and <!-- ... --> blocks use the theme's muted comment
 colour, including across blank lines. Optional nested and // comments are not
 supported; //italic// retains its normal DokuWiki highlighting.
 
+With Comment Syntax enabled, Ctrl+/ (Cmd+/ on Mac) toggles a /* ... */ comment
+around the current line or selected lines. Press again to uncomment; ordinary
+Undo also restores the text. Inside a highlighted code block, CodeMirror uses
+that language's comment syntax when available. Read-only editors are unchanged.
+Existing editor shortcuts are preserved. The helper is the CodeMirror 5.65.21 comment add-on, bundled under
+vendor/codemirror with its MIT license. Its token checks use fresh parsing
+instead of cached display styles, so edits across blank lines toggle reliably:
+https://github.com/codemirror/codemirror5/blob/5.65.21/addon/comment/comment.js
+
 MathJax highlighting covers $...$, $$...$$, \(...\), \[...\], and the named
 environments protected by the MathJax plugin: math, displaymath, equation,
 eqnarray, align, flalign, alignat, multline and gather (including supported
@@ -48,12 +57,19 @@ across blank lines; nested environments with other names do not end it early.
 The whole expression uses string and string-2 token styles, so themes such as
 Monokai that do not colour string-2 still highlight it as a string.
 
-This is a highlighter, not syntax validation or autocomplete. It never changes
-the text that is saved. Update definitions.js here when adding custom syntax.
+Highlighting does not change saved text; the comment shortcut edits the source
+only when invoked. This is not syntax validation or autocomplete.
+Update definitions.js here when adding custom syntax.
 Code/file/nowiki and embedded language contents retain their native highlighting.
 Supported plugins do not require this integration to render pages.
 
 The tests/mode.test.mjs regression test uses the installed CodeMirror mode:
   node lib/plugins/codemirrorsyntax/tests/mode.test.mjs
 
-License: GPL-2.0-or-later
+The tests/comments.html browser fixture checks actual Ctrl+/ and Cmd+/ events,
+selections, blank lines, undo, embedded languages, read-only mode and hook reuse.
+With the upstream CodeMirror plugin installed alongside this plugin, run:
+  google-chrome --headless --allow-file-access-from-files --dump-dom --virtual-time-budget=10000 file:///absolute/path/to/codemirrorsyntax/tests/comments.html
+The result element should report PASS 14 browser checks.
+
+License: GPL-2.0-or-later (vendored CodeMirror helper: MIT)
