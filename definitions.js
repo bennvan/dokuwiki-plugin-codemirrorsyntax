@@ -8,7 +8,7 @@ const mathEnvironments = [
 
 const definitions = {
     approve: {
-        tokens: [{match: /^@APPROVE_(?:VERSION|DATE|USER)@/, style: "variable-2"}],
+        tokens: [{match: /^@APPROVE_(?:VERSION|DATE|USER|NAME)@/, style: "variable-2"}],
         blocks: [{open: /^----+ *approve table *-+/, close: /^----+/, style: "meta", sol: true}],
     },
     bootswrapper: {

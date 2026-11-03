@@ -103,6 +103,7 @@ has('{{ model.stl?width=400 }}', 'model.stl', 'link');
 has('{{ model.stl?width=400 }}', '}}', 'tag');
 has('{{model.stl?width=400&color=blue}}', 'color', 'attribute');
 has('@APPROVE_VERSION@', '@APPROVE_VERSION@', 'variable-2');
+has('@APPROVE_NAME@', '@APPROVE_NAME@', 'variable-2');
 has('---- approve table ----\ncolumns: title,version\n----\n<card>', 'columns: title,version', 'meta');
 has('---- approve table ----\ncolumns: title,version\n----\n<card>', '<card', 'tag');
 has('<code js nowrap [demo.js] | Title>\nconst x = 1;\n</code>', '[demo.js]', 'string');
