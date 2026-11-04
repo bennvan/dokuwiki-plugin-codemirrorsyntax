@@ -8,8 +8,8 @@ const mathEnvironments = [
 
 const definitions = {
     approve: {
-        tokens: [{match: /^@APPROVE_(?:VERSION|DATE|USER|NAME)@/, style: "variable-2"}],
-        blocks: [{open: /^----+ *approve table *-+/, close: /^----+/, style: "meta", sol: true}],
+        tokens: [{match: /^@APPROVE_(?:VERSION|DATE|USER|NAME|MESSAGE)@/, style: "variable-2"}],
+        blocks: [{open: /^----+ *approve (?:table|history) *-+/, close: /^----+/, style: "meta", sol: true}],
     },
     bootswrapper: {
         tags: ["ALERT", "BADGE", "BOOTSTRAP", "JUMBOTRON", "LABEL", "TEXT", "WRAPPER", "accordion", "affix", "alert", "badge", "bar", "bscaption", "btn", "button", "callout", "card", "card-body", "carousel", "col", "collapse", "grid", "hidden", "image", "invisible", "jumbotron", "label", "lead", "list-group", "modal", "nav", "page-header", "page-nav", "pane", "panel", "panel-body", "pills", "popover", "progress", "ribbon", "row", "show", "slide", "tabs", "text", "thumbnail", "tooltip", "well", "wrapper"],
